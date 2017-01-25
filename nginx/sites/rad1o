@@ -1,0 +1,32 @@
+server {
+        listen ************:80;
+        root /hostdata/rad1o.co/public_html;
+        index index index.html index.php;
+        server_name rad1o.co www.rad1o.co;
+
+
+        location / {
+         access_log /hostdata/rad1o.co/logs/access.log;
+         error_log  /hostdata/rad1o.co/logs/error.log;
+         try_files $uri $uri/ /index.php?$args;
+        }
+
+        location /live {
+         proxy_pass http://live01;
+         proxy_http_version 1.1;
+         proxy_set_header Upgrade $http_upgrade;
+         proxy_set_header Connection $connection_upgrade;
+        }
+
+        location /stats {
+        proxy_pass http://localhost/status2.xsl;
+        }
+
+        location ~ \.php {
+          try_files $uri /index.php =404;
+          fastcgi_pass 127.0.0.1:9000;
+          fastcgi_index index.php;
+          fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+          include fastcgi_params;
+        }
+}
